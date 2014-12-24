@@ -1,9 +1,15 @@
 #! /usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
+'''
+Work with whole lists of errval's:
+ [v0+-e0, v1+-e1, ...]
+'''
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+from errval import *
 
 
 class errvallist(list):
@@ -95,13 +101,14 @@ class errvallist(list):
     Depending on the circumstances the code incorporating this class
     may want to use different names for the following functions:
     '''
-    def v(self): return values(self)
+    def v(self): return np.array([ev.val() for ev in self])
     def val(self): return self.v()
     def vals(self): return self.v()
     def values(self): return self.v()
 
-    def e(self): return errors(self)
+    def e(self): return np.array([ev.err() for ev in self])
     def err(self): return self.e()
     def errs(self): return self.e()
     def errors(self): return self.e()
+
 

@@ -3,51 +3,53 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from general_functions import find_index, find_index_iter
 
+from errval import *
+from errvallist import *
+from stderrval import *
 
 '''
 functions for dealing with lists containing errvals
 not necessarily errvallists
 '''
 
+def values(errvall):
+    if not isinstance(errvall,errvallist):
+        errvall = errvallist(errvall)
+    return errvall.v()
+def errors(errvall):
+    if not isinstance(errvall,errvallist):
+        errvall = errvallist(errvall)
+    return errvall.e()
+def tuples(errvall):
+    return zip(values(errvall),errors(errvall))
 
-def values(errvallist):
-    return np.array([ev.val() for ev in errvallist])
-def errors(errvallist):
-    return np.array([ev.err() for ev in errvallist])
-def tuples(errvallist):
-    return zip(values(errvallist),errors(errvallist))
 
-def find_fooval(errvallist,foo,index=False):
-    '''
-    Find value in list closes to foo(list)
-    e.g. foo=max returns the maximum value in the list
-    caution: this might not terminate
-    (unclear why, open question over at general_functions)
-    if not just 'closet' but exact value looked for,
-    pick find_fooval_iter
-    '''
-    v = values(errvallist)
-    i = find_index(v,foo(v))
-    if index: return errvallist[i], i
-    else: return errvallist[i]
-def find_fooval_iter(errvallist,foo,index=False):
-    '''
-    Find value in list corresponding exactly to foo(list)
-    e.g. foo=max returns the maximum value in the list
-    '''
-    v = values(errvallist)
-    i = find_index_iter(v,foo(v))
-    if index: return errvallist[i], i
-    else: return errvallist[i]
+def _find_closest_index(L,value):
+    # find closest >= value (if there is an entry closer but below, it is ignored)
+    # L must be sorted in ascending order (i.e. from low to high)
+    idx = L.searchsorted(value)
+    idx = np.min([np.max([idx,0]), len(L)-1]) # or: np.clip(idx, 0, len(L)-1)
+    return idx
+def _find_closest_fooval(L,foo,index=False):
+    # return value from list L,
+    # whose value is closest to the result of function foo 
+    # index = True or False, whether to return the corresponding index
+    if isinstance(L,errvallist):
+        v = values(L)
+    else:
+        v = L
+    i = _find_closest_index(v,foo(v))
+    if index: return L[i], i
+    else: return L[i]
 
-def max_(errvallist,index=True):
-    # there is only one value,
-    # and that one is exact, so go with _iter:
-    return find_fooval_iter(errvallist,max,index)
-def min_(errvallist,index=True):
-    return find_fooval_iter(errvallist,min,index)
+
+def max(errvallist,index=True):
+    # index = True or False, whether to return the corresponding index
+    return _find_closest_fooval(errvallist,np.max,index)
+def min(errvallist,index=True):
+    # index = True or False, whether to return the corresponding index
+    return _find_closest_fooval(errvallist,np.min,index)
 
 def wmean(errvallist):
     '''

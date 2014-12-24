@@ -5,6 +5,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+#from sys import exit
+
+from errval import *
+from errvallist import *
+from stderrval import *
+from functions import *
+
 '''
 TODO: actual unittest!
 '''
@@ -23,7 +30,7 @@ def main():
     print 'exp: {0} {1} \ngot: {2} {3}\n---'.format(aa,da, a.val(), a.err())
     print 'exp: {0} \pm {1} \ngot: {2}\n---'.format(aa,da,a)
     print 'exp: {0} +- {1} \ngot: {2}\n---'.format(bb,db,b)
-    print 'exp: <class \'__main__.errval\'> True \ngot: {0} {1}\n---'.format(type(b), isinstance(b,errval))
+    print 'exp: <class \'errval.errval\'> True \ngot: {0} {1}\n---'.format(type(b), isinstance(b,errval))
     
     
     # some arithmetic
@@ -66,28 +73,19 @@ def main():
 
     n0 = np.sqrt(m0)
     print 'exp: {0} \pm {1} \ngot: {2}\n---'.format(np.sqrt(2),4/(2*np.sqrt(2)),n0)
-
-    p0, p1 = errval((1,2)), errval((1,2,'+-'))
-#    p2 = errval((1,2,3)) # error because input nonsense
-#    p3 = errval([]) # also.
-    print p0
-    print p1
-    print '---'
     
     abc = [a,b,c]
     abcv, abce, abct = values(abc), errors(abc), tuples(abc)
     print 'exp: {0}\ngot: {1}\n---'.format(f0,np.sum(abc))
-    print abcv
-    print abce
-    print zip(abcv,abce)
-    print abct
-    print '---'
+    print 'exp: {0}\ngot: {1}\n---'.format(zip(abcv,abce),abct)
+
     abc_ = errvallist([a,b,c])
+    print 'exp: <class \'errvallist.errvallist\'> True \ngot: {0} {1}\n---'.format(type(abc_), isinstance(abc_,errvallist))
     print 'Remember: {0}'.format(abc_)
     print 'exp: {0}\ngot: {1}\n---'.format(values(abc),abc_.v())
     print 'exp: {0}\ngot: {1}\n---'.format(errors(abc),abc_.errs())
     print 'exp: {0}\ngot: {1}\n---'.format(f0,np.sum(abc_))
-    print 'exp: {0},{1}\ngot: {2},{3}\n---'.format(c,2,min_(abc_)[0],min_(abc_)[1])
+    print 'exp: {0},{1}\ngot: {2},{3}\n---'.format(c,2,min(abc_)[0],min(abc_)[1])
 
     q0, q1 = errval(100,10), errval(1,1)
     r0, r1 = errval(3.11,0.02), errval(3.13,0.01)

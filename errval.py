@@ -1,6 +1,10 @@
 #! /usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
+'''
+Work with errorbars on your data:
+ value +- error
+'''
 
 import numpy as np
 import matplotlib.pyplot as plt
