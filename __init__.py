@@ -9,3 +9,21 @@ c = f(a+-da,b+-db)
 
 each implemented operation {+, -, *, /, **, abs()} returns a new instance.
 """
+
+__author__ = "Stefan T. Keller"
+__version__ = '1.0'
+
+
+import errval
+from errval import *
+
+import errvallist
+from errvallist import *
+
+import stderrval
+from stderrval import *
+
+import functions
+from functions import *
+
+#__all__ = ['errval','errvallist','stderrval','functions']
