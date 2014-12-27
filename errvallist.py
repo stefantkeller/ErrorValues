@@ -7,7 +7,6 @@ Work with whole lists of errval's:
 '''
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 from errval import *
 

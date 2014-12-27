@@ -7,7 +7,6 @@ Work with errorbars on your data:
 '''
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 class errval(object):
