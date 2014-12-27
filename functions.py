@@ -141,7 +141,7 @@ def _linregA(B, xys):
     xi, yi, si = zip(*xys)
     n = len(xys)
     isi = np.sum([1.0/ssi**2 for ssi in si]) # sum of inverse error squares
-    A = 1.0/isi * np.sum([(B*xi[i]-yi[i])/si[i]**2 for i in xrange(n)])
+    A = 1.0/isi * np.sum([(yi[i]-B*xi[i])/si[i]**2 for i in xrange(n)])
     return A
 
 def _linregB(xys):
@@ -160,11 +160,14 @@ def _linregB(xys):
     B = (isi*xiyisi2 - xisi2*yisi2)*1.0/(isi*xi2si2 - xisi2**2)
     return B
 
-def linreg(xi,yi,si):
+def linreg(xi,yi,si,overwrite_zeroerrors=False):
     '''
     xi the x values,
     yi the y values,
     si the uncertainties (/errors) attached to yi
+    overwrite0errors = True or False, if one of the si's is ==0, the function cannot work b/c we divide through si
+        True: overwrite those 0 entries with 0.1*min of residual error entries
+        False: raise a ValueError, because this function cannot function with a 0...!
 
     returns coefficients A and B for y=A+Bx
 
@@ -189,7 +192,13 @@ def linreg(xi,yi,si):
         raise ValueError, 'Inputs cannot be brought together with lengths {}, {}'.format(len(xi),n)
 
     if 0 in si:
-        raise ValueError, 'This function cannot operate with 0 error entries.'
+        valid_errors = np.array(si)!=0
+        if overwrite_zeroerrors and np.sum(valid_errors)>0: # there is at least one valid error
+            min_valid = np.min(si[valid_errors])
+            for i in xrange(n):
+                if si[i]==0: si[i]=min_valid*0.1
+        else:
+            raise ValueError, 'This function cannot operate with 0 error entries.'
 
     xys = zip(xi,yi,si)
 
