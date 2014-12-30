@@ -1,7 +1,6 @@
 #! /usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-
 import numpy as np
 
 #from sys import exit
@@ -114,6 +113,12 @@ def main():
     u0 = stderrvallist(u)
     v = errvallist([1.5,2.5,3.5],[0.5,0.5,0.5])
     print 'exp: {0}\ngot: {1}\n---'.format(v,u0)
+    
+    # easy conversion from textinput
+    inpt = 'errval(1717.23778659,4.01881849784)*p+errval(-0.143950786896,0.0390027414101)'
+    w = str2errvallist(inpt)
+    print 'exp: {0}\ngot: {1}\n---'.format(2,len(w))
+    print 'exp: {0}\ngot: {1}\n---'.format(w[1].v(),-0.143950786896)
     
 
 

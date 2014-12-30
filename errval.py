@@ -4,6 +4,8 @@
 '''
 Work with errorbars on your data:
  value +- error
+
+TODO: resolve compatibility issue with __truediv__
 '''
 
 import numpy as np
@@ -28,23 +30,24 @@ class errval(object):
             self.__assign_err(val.err())
             self.__printout = val.printout()
             if printout.endswith('!'): self.__printout = printout[:-1] # forget the !
-        elif ( isinstance(val,tuple) and len(val)==2
-               and isinstance(val[0],(int,float,long)) and isinstance(val[1],(int,float,long)) ):
-            self.__val = val[0]
-            self.__assign_err(val[1])
-            self.__printout = printout
-        elif ( isinstance(val,tuple) and len(val)==3
-               and isinstance(val[0],(int,float,long)) and isinstance(val[1],(int,float,long))
-               and isinstance(val[2],str) ):
-            self.__val = val[0]
-            self.__assign_err(val[1])
-            self.__printout = val[2]
+        elif ( isinstance(val,tuple) and 2<=len(val)<=3 ):
+            try:
+                self.__val = float(val[0])
+                self.__assign_err(float(val[1]))
+                if len(val)==3:
+                    printout = val[2]
+                    if printout.endswith('!'): printout = printout[:-1] # when in tuples, this is meta option pointless
+                    self.__printout = printout
+                else:
+                    self.__printout = printout # default value
+            except ValueError:
+                raise ValueError, 'cannot convert to errval: {0}'.format(val)
         elif isinstance(val,(int,float,long)):
             self.__val = val
             self.__assign_err(err)
             self.__printout = printout
         else:
-            raise ValueError, 'Cannot assign input data'
+            raise ValueError, 'Cannot assign input data: errval({0},{1})'.format(val,err)
 
     
     def val(self):

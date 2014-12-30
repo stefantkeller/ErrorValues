@@ -1,6 +1,7 @@
 #! /usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
+import re
 import numpy as np
 
 from errval import *
@@ -25,6 +26,11 @@ def errors(errvall):
 def tuples(errvall):
     return zip(values(errvall),errors(errvall))
 
+def str2errvallist(str):
+    p = re.compile('errval\((-?\d*.\d*),(\d*.\d*),?(errvalmode)?\)')
+    lst = re.findall(p,str) # returns list of tuples of length 2 or 3, errval knows how to handle tuple input
+    return errvallist(lst)
+    
 
 def _find_closest_index(L,value):
     # find closest >= value (if there is an entry closer but below, it is ignored)
