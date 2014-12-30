@@ -27,7 +27,7 @@ class errval(object):
             self.__val = val.val()
             self.__assign_err(val.err())
             self.__printout = val.printout()
-            if printout.endswith('!'): self.__printout = printout
+            if printout.endswith('!'): self.__printout = printout[:-1] # forget the !
         elif ( isinstance(val,tuple) and len(val)==2
                and isinstance(val[0],(int,float,long)) and isinstance(val[1],(int,float,long)) ):
             self.__val = val[0]
