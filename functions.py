@@ -32,12 +32,35 @@ def str2errvallist(str):
     return errvallist(lst)
     
 
-def _find_closest_index(L,value):
-    # find closest >= value (if there is an entry closer but below, it is ignored)
-    # L must be sorted in ascending order (i.e. from low to high)
-    idx = L.searchsorted(value)
-    idx = np.min([np.max([idx,0]), len(L)-1]) # or: np.clip(idx, 0, len(L)-1)
-    return idx
+def _find_index_iteratively(array,value,low=None,high=None):
+    '''
+    same as find_index() but the value has to be exact
+    [low,high] constrains search if approx position in the array is known already
+
+    example:
+    a = [1,2,3,4,5,6,7,8,9,0]
+    it = find_index_iter(a,4)
+    print it, (it==3)
+    it = find_index_iter(a,8,high=6)
+    print it, (it==None)
+    it = find_index_iter(a,8,high=7)
+    print it, (it==7)
+    it = find_index_iter(a,0,low=7)
+    print it, (it==9)
+    '''
+    if low==None: low=0
+    if high==None: high=len(array)-1
+
+    it = low
+    for search in xrange(high-low+1):
+    # one more iteration than range: to get last iteration as well.
+    # if the value is found, this loop should break
+    # if it doesn't the last +=1 is executed, which we can detect.
+        if array[it]==value: break
+        it += 1
+    if it==high+1: it=None # not found; loop didn't break
+    return it
+
 def _find_closest_fooval(L,foo,index=False):
     # return value from list L,
     # whose value is closest to the result of function foo 
@@ -46,17 +69,16 @@ def _find_closest_fooval(L,foo,index=False):
         v = values(L)
     else:
         v = L
-    i = _find_closest_index(v,foo(v))
+    i = _find_index_iteratively(v,foo(v))
     if index: return L[i], i
     else: return L[i]
 
-
-def max(errvallist,index=True):
+def max(evl,index=True):
     # index = True or False, whether to return the corresponding index
-    return _find_closest_fooval(errvallist,np.max,index)
-def min(errvallist,index=True):
+    return _find_closest_fooval(evl,np.max,index)
+def min(evl,index=True):
     # index = True or False, whether to return the corresponding index
-    return _find_closest_fooval(errvallist,np.min,index)
+    return _find_closest_fooval(evl,np.min,index)
 
 def wmean(errvallist):
     '''
