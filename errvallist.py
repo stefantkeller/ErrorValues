@@ -101,6 +101,10 @@ class errvallist(list):
 
     def append(self,value):
         self.__errl.append(value)
+        
+    def round(self,n=0):
+        # returns new instance
+        return errvallist([errv.round(n) for errv in self])
 
     '''
     Depending on the circumstances the code incorporating this class

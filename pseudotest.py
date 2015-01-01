@@ -124,6 +124,9 @@ def main():
     x1 = errvallist(x1_)
     print 'exp: {0}\ngot: {1}\n---'.format(errval(2),x1[1])
     print 'exp: {0}\ngot: {1}\n---'.format(errvallist(x1_[0:2]),x1[0:2])
+    
+    y1 = errvallist([(1.234,0.567),(8.901,2.345)])
+    print 'exp: {0}\ngot: {1}\n---'.format(errvallist([(1.23,0.57),(8.90,2.35)]),y1.round(2))
 
 
 if __name__ == '__main__': main()
