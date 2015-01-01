@@ -33,6 +33,12 @@ class errvallist(list):
     def __setitem__(self,key,value):
         self.__errl[key]=value
 
+    def __getslice__(self,i,j):
+        # https://docs.python.org/2/reference/datamodel.html#object.__getslice__
+        # Deprecated since version 2.0
+        # but since I derive from list I have to ignore this deprecation...
+        return errvallist(self.__errl[i:j])
+
     def __str__(self):
         outp = '['
         for evl in self.__errl:

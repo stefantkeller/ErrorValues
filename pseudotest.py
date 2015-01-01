@@ -120,6 +120,10 @@ def main():
     print 'exp: {0}\ngot: {1}\n---'.format(2,len(w))
     print 'exp: {0}\ngot: {1}\n---'.format(w[1].v(),-0.143950786896)
     
+    x1_ = [1,2,3]
+    x1 = errvallist(x1_)
+    print 'exp: {0}\ngot: {1}\n---'.format(errval(2),x1[1])
+    print 'exp: {0}\ngot: {1}\n---'.format(errvallist(x1_[0:2]),x1[0:2])
 
 
 if __name__ == '__main__': main()
