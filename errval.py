@@ -177,6 +177,43 @@ class errval(object):
     
     def sqrt(self):
         return self**0.5
+    
+    def log(self):
+        '''
+        general case:
+            c = log_a(b)
+         => \Delta c = \sqrt( (\partial c/\partial a)^2 * (\Delta a)^2
+                               + (\partial c/\partial b)^2 * (\Delta b)^2 )
+        let ln be log_e (i.e. natural log, what numpy means with log()), then:
+            . log_a(b) = ln(b)/ln(a)
+            . dln(x)/dx = 1/x
+        hence:
+            \partial log_a(b)/ \partial a = ln(b) * \partial ln(a)^-1 / \partial a
+                                         = ln(b) * (- ln(a)^-2 * 1/a)
+            \partial log_a(b)/ \partial b = 1/ln(a) * \partial ln(b) / \partial b
+                                        = 1/ln(a) * 1/b
+        
+        the implemented cases have a fix base, therefore
+            \Delta c = \sqrt( (\partial c/\partial b)^2 * (\Delta b)^2 )
+                     = \sqrt( (1/ln(a) * 1/b)^2 * (\Delta b)^2 )
+        '''
+        c = np.log(self.val())
+        dc = abs( self.err()/self.val() )
+        return errval(c,dc,self.printout())
+    def log10(self):
+        '''
+        see derivation in log()
+        '''
+        c = np.log10(self.val())
+        dc = abs( 1.0/np.log(10) * self.err()/self.val() )
+        return errval(c,dc,self.printout())
+    def log2(self):
+        '''
+        see derivation in log()
+        '''
+        c = np.log2(self.val())
+        dc = abs( 1.0/np.log(2) * self.err()/self.val() )
+        return errval(c,dc,self.printout())
 
     def round(self,n=0):
         # returns new instance
