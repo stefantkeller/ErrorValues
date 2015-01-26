@@ -151,12 +151,15 @@ def interplist(v,evx,evy):
         raise TypeError, 'This function is for errvallists, try np.interp'
     if isinstance(evx,errvallist):
         evx = evx.v() # errval has only one-dimensional error
+    if isinstance(v,errval): v = v.v()
     i0 = np.sum([e<=v for e in evx])
-    #if i0==0 or i0==len(evx): raise ValueError,\
-    #            'Value outside interpolation values: index {0}, list len {1}'.format(i0,len(evx))
     # if outside interpolation values, take top or bottom value.
-    xy0 = (evx[np.max([i0-1,0])],evy[np.max([i0-1,0])])
-    xy1 = (evx[np.min([i0,len(evx)-1])],evy[np.min([i0,len(evy)-1])])
+    try:
+        xy0 = (evx[np.max([i0-1,0])],evy[np.max([i0-1,0])])
+        xy1 = (evx[np.min([i0,len(evx)-1])],evy[np.min([i0,len(evy)-1])])
+    except IndexError, e:
+        print '\nIssued with index',i0,'on list lengths',map(len,[evx,evy]),'\n'
+        raise IndexError, e
     return interp(v,xy0,xy1)
 
 def reorder(evlist, instr):
