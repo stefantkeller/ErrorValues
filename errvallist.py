@@ -12,7 +12,7 @@ from errval import *
 
 
 class errvallist(list):
-    def __init__(self,vals,errs=0,printout='latex'):
+    def __init__(self,vals=[],errs=0,printout='latex'):
         if isinstance(vals,errvallist):
             self.__errl = vals
         elif isinstance(vals,(list,np.ndarray)) or isinstance(errs,(list,np.ndarray)):
