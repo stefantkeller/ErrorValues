@@ -3,6 +3,7 @@
 
 import re
 import numpy as np
+from itertools import izip, count # izip for maximum efficiency: http://stackoverflow.com/questions/176918/finding-the-index-of-an-item-given-a-list-containing-it-in-python
 
 from errval import *
 from errvallist import *
@@ -131,6 +132,7 @@ def interp(v,evxy0,evxy1):
     x0, y0 = errval(evxy0[0]), errval(evxy0[1])
     x1, y1 = errval(evxy1[0]), errval(evxy1[1])
 
+    if x1.v()==x0.v(): return evxy0[1] # they're the same, cannot work with it
     scaling = float(v-x0.v())/(x1.v()-x0.v())
     y = y0.v() + scaling*(y1.v()-y0.v())
     ye = y0.e() + scaling*abs(y1.e()-y0.e())
@@ -144,19 +146,30 @@ def interplist(v,evx,evy):
     evy must be a errvallist
     '''
     if not isinstance(evx,(list,tuple,errvallist,np.ndarray)):
-        raise TypeError, 'evx is of unexpected type: {0}'.format(
-                type(evx))
+        raise TypeError, 'evx is of unexpected type: {0}'.format(type(evx))
     if not isinstance(evy,errvallist):
         raise TypeError, 'This function is for errvallists, try np.interp'
     if isinstance(evx,errvallist):
         evx = evx.v() # errval has only one-dimensional error
     i0 = np.sum([e<=v for e in evx])
-    if i0==0: raise ValueError,\
-                'Value below interpolation values: {0}<{1}'.format(
-                    i0,evx[0])
-    xy0 = (evx[i0-1],evy[i0-1])
-    xy1 = (evx[i0],evy[i0])
+    #if i0==0 or i0==len(evx): raise ValueError,\
+    #            'Value outside interpolation values: index {0}, list len {1}'.format(i0,len(evx))
+    # if outside interpolation values, take top or bottom value.
+    xy0 = (evx[np.max([i0-1,0])],evy[np.max([i0-1,0])])
+    xy1 = (evx[np.min([i0,len(evx)-1])],evy[np.min([i0,len(evy)-1])])
     return interp(v,xy0,xy1)
+
+def reorder(evlist, instr):
+    return errvallist([evlist[i] for i in instr])
+
+def sorting_instr(evlist):
+    #http://stackoverflow.com/questions/176918/finding-the-index-of-an-item-given-a-list-containing-it-in-python
+    #http://stackoverflow.com/questions/479897/how-do-you-remove-duplicates-from-a-list-in-python-if-the-item-order-is-not-impo
+    v = sorted(values(evlist))
+    ret = []
+    for k in v:
+        ret.extend([i for i, j in izip(count(), evlist.v()) if j == k])
+    return ret
 
 # -----------------------------------------------------------------------
 
@@ -238,6 +251,17 @@ def linreg(xi,yi,si,overwrite_zeroerrors=False):
     #  The American Statistician, Vol 37, No 1 (Feb 1983), pp. 36-48
     # for a separate view at this method see also
     # https://github.com/stefantkeller/STK_py_generals/blob/master/jackknife_bootstrap.py
+
+    # this makes sense only iff there are enough data available
+    # how much 'enough' means is difficult to say
+    # but clearly more than two!
+    if len(xi)<=2:
+        sigma_A = np.nan
+        sigma_B = np.nan
+        return errval(A,sigma_A), errval(B,sigma_B)
+        
+        
+    # only evaluate if there are more than two data points available
 
     A_, B_ = [], []
     for k in xrange(n):
