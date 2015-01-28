@@ -81,19 +81,19 @@ def min(evl,index=True):
     # index = True or False, whether to return the corresponding index
     return _find_closest_fooval(evl,np.min,index)
 
-def wmean(errvallist):
+def wmean(evlist):
     '''
     weighted mean
 
     sigma_<x>^2 = sum(1/sigma_i^2)
     <x> = sum(x_i/sigma_i^2)/sigma_<x>^2
     '''
-    printmode = errvallist[0].printout()
-    vals = values(errvallist)
+    printmode = evlist[0].printout()
+    vals = values(evlist)
     #print vals
-    errs = errors(errvallist)
+    errs = errors(evlist)
     #print errs
-    N = len(errvallist)
+    N = len(evlist)
     sig_x = np.sum([1.0/si**2 for si in errs])
     sum_x = np.sum([vals[i]*1.0/errs[i]**2 for i in range(N)])
     return errval(sum_x*1.0/sig_x,1.0/np.sqrt(sig_x),printmode)
