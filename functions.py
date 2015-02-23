@@ -140,10 +140,14 @@ def interp(v,evxy0,evxy1):
     #xe = scalingy*abs(x1.e()-x0.e())
     return errval(y,ye)
 
-def interplist(v,evx,evy):
+def interplist(v,evx,evy, error_on_extrapolation_attempt=True):
     '''
+    v a value corresponding to evx for which we look its counterpart among evy
     evx must be an ordered (errval,)list or a numpy.ndarray
     evy must be a errvallist
+    when v is outside the coverage of evx we raise an IndexError if error_on_extrapolation_attempt
+    otherwise the edge value is assumed
+    (careful, your data may then suggest a trend simply because one of the inputs got capped along the way!)
     '''
     if not isinstance(evx,(list,tuple,errvallist,np.ndarray)):
         raise TypeError, 'evx is of unexpected type: {0}'.format(type(evx))
@@ -153,12 +157,15 @@ def interplist(v,evx,evy):
         evx = evx.v() # errval has only one-dimensional error
     if isinstance(v,errval): v = v.v()
     i0 = np.sum([e<=v for e in evx])
+    nevx, nevy = map(len,[evx,evy])
+    if error_on_extrapolation_attempt and (i0==0 or i0==nevx):
+        raise IndexError, 'Requested value goes beyond interpolation, results won\'t make sense. Set error_on_extrapolation_attempt=False in order to ignore this and clip.'
     # if outside interpolation values, take top or bottom value.
     try:
         xy0 = (evx[np.max([i0-1,0])],evy[np.max([i0-1,0])])
-        xy1 = (evx[np.min([i0,len(evx)-1])],evy[np.min([i0,len(evy)-1])])
+        xy1 = (evx[np.min([i0,nevx-1])],evy[np.min([i0,nevy-1])])
     except IndexError, e:
-        print '\nIssued with index',i0,'on list lengths',map(len,[evx,evy]),'\n'
+        print '\nIssued with index',i0,'on list lengths',[nevx,nevy],'\n'
         raise IndexError, e
     return interp(v,xy0,xy1)
 
