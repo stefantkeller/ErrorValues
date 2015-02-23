@@ -1,5 +1,5 @@
 """
-https://github.com/stefantkeller/ErrorValues
+https://github.com/stefantkeller/errorvalues
 
 Convenience class to work with error (aka uncertainty) attached
 
