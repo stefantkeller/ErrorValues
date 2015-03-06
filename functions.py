@@ -1,6 +1,7 @@
 #! /usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
+import warnings
 import re
 import numpy as np
 from itertools import izip, count # izip for maximum efficiency: http://stackoverflow.com/questions/176918/finding-the-index-of-an-item-given-a-list-containing-it-in-python
@@ -140,7 +141,7 @@ def interp(v,evxy0,evxy1):
     #xe = scalingy*abs(x1.e()-x0.e())
     return errval(y,ye)
 
-def interplist(v,evx,evy, error_on_extrapolation_attempt=True):
+def interplist(v,evx,evy, warning_on_extrapolation_attempt=True):
     '''
     v a value corresponding to evx for which we look its counterpart among evy
     evx must be an ordered (errval,)list or a numpy.ndarray
@@ -158,8 +159,11 @@ def interplist(v,evx,evy, error_on_extrapolation_attempt=True):
     if isinstance(v,errval): v = v.v()
     i0 = np.sum([e<=v for e in evx])
     nevx, nevy = map(len,[evx,evy])
-    if error_on_extrapolation_attempt and (i0==0 or i0==nevx):
-        raise IndexError, 'Requested value goes beyond interpolation, results won\'t make sense. Set error_on_extrapolation_attempt=False in order to ignore this and clip.'
+    if warning_on_extrapolation_attempt:
+        if i0==0:
+            warnings.warn('Requested value ({}) is *below* interpolation, results won\'t make sense. Set error_on_extrapolation_attempt=False in order to ignore this and clip.'.format(v))
+        elif i0==nevx:
+            warnings.warn('Requested value ({}) is *above* interpolation, results won\'t make sense. Set error_on_extrapolation_attempt=False in order to ignore this and clip.'.format(v))
     # if outside interpolation values, take top or bottom value.
     try:
         xy0 = (evx[np.max([i0-1,0])],evy[np.max([i0-1,0])])
