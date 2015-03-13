@@ -10,7 +10,7 @@ Combine the error to the value in one and the same object.
 Example:
 
 
-import ErrorValues as ev  
+import errorvalues as ev  
 
 a = ev.errval(2,1) # 2+-1  
 b = ev.errval(3,1.5)  
