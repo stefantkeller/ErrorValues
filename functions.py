@@ -29,7 +29,7 @@ def tuples(errvall):
     return zip(values(errvall),errors(errvall))
 
 def str2errvallist(strng):
-    p = re.compile('errval\((-?\d*.\d*e?-?\d*?),(\d*.\d*e?-?\d*?),?(errvalmode)?\)')
+    p = re.compile('errval\((-?\d*.\d*e?-?\d*?),(\d*.\d*e?-?\d*?),?(errvalmode)?\)') # note, errvalmode is detected, but will throw an error!
     lst = re.findall(p,strng) # returns list of tuples of length 2 or 3, errval knows how to handle tuple input
     return errvallist(lst)
     
